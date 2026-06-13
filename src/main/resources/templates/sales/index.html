@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Riwayat Penjualan', activePage='sales', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Riwayat Penjualan</span>
+            </div>
+            <h2>🧾 Riwayat Penjualan</h2>
+        </div>
+        <form th:action="@{/sales}" method="get" class="d-flex gap-2 align-center">
+            <input type="date" name="date" class="form-control" th:value="${selectedDate}" style="width:auto">
+            <button type="submit" class="btn btn-primary">🔍 Filter</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📋 Data Penjualan (<span th:text="${sales.size()}">0</span> transaksi)</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>No. Invoice</th>
+                        <th>Kasir</th>
+                        <th>Total</th>
+                        <th>Dibayar</th>
+                        <th>Kembalian</th>
+                        <th>Metode</th>
+                        <th>Status</th>
+                        <th>Waktu</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${sales.isEmpty()}">
+                        <td colspan="10">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🧾</div>
+                                <h3>Belum Ada Transaksi</h3>
+                                <p>Tidak ada penjualan pada tanggal ini</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="sale, iter : ${sales}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:12px"
+                                  th:text="${sale.invoiceNumber}">TRX-000</code>
+                        </td>
+                        <td th:text="${sale.user.fullName}">Kasir</td>
+                        <td>
+                            <span style="font-weight:700;color:var(--accent)"
+                                  th:text="'Rp ' + ${#numbers.formatDecimal(sale.totalAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+                        </td>
+                        <td th:text="'Rp ' + ${#numbers.formatDecimal(sale.paidAmount, 1, 'COMMA', 0, 'POINT')}">0</td>
+                        <td th:text="'Rp ' + ${#numbers.formatDecimal(sale.changeAmount, 1, 'COMMA', 0, 'POINT')}">0</td>
+                        <td>
+                            <span class="badge badge-info" th:text="${sale.paymentMethod}">CASH</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success" th:if="${sale.status == 'COMPLETED'}">✅ Selesai</span>
+                            <span class="badge badge-danger" th:unless="${sale.status == 'COMPLETED'}" th:text="${sale.status}">-</span>
+                        </td>
+                        <td style="font-size:12px" th:text="${#temporals.format(sale.soldAt, 'dd MMM HH:mm')}">-</td>
+                        <td>
+                            <a th:href="@{/sales/receipt/{id}(id=${sale.id})}" class="btn btn-ghost btn-sm" target="_blank">🧾 Struk</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts"></th:block>
+</body>
+</html>

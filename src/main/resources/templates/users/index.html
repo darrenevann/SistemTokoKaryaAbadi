@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Manajemen User', activePage='users', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Manajemen User</span>
+            </div>
+            <h2>👥 Manajemen User</h2>
+            <p>Kelola akun pengguna dan hak akses sistem</p>
+        </div>
+        <button class="btn btn-primary" onclick="Modal.open('add-user-modal')">➕ Tambah User</button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Daftar User (<span th:text="${users.size()}">0</span>)</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Nama Lengkap</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user, iter : ${users}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:12px"
+                                  th:text="${user.username}">admin</code>
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:10px">
+                                <div class="user-avatar" th:text="${user.fullName.substring(0,1).toUpperCase()}" style="width:30px;height:30px;font-size:12px">A</div>
+                                <span style="font-weight:600" th:text="${user.fullName}">Admin</span>
+                            </div>
+                        </td>
+                        <td th:text="${user.email ?: '-'}">-</td>
+                        <td th:text="${user.phone ?: '-'}">-</td>
+                        <td>
+                            <span th:class="${user.role.name == 'ADMIN'} ? 'badge badge-danger' : (${user.role.name == 'KASIR'} ? 'badge badge-info' : 'badge badge-success')"
+                                  th:text="${user.role.name}">ROLE</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success" th:if="${user.isActive}">Aktif</span>
+                            <span class="badge badge-gray" th:unless="${user.isActive}">Nonaktif</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-warning btn-sm" onclick="openEditUser(this)"
+                                        th:data-id="${user.id}"
+                                        th:data-username="${user.username}"
+                                        th:data-fullname="${user.fullName}"
+                                        th:data-email="${user.email}"
+                                        th:data-phone="${user.phone}"
+                                        th:data-role="${user.role.id}"
+                                        th:data-active="${user.isActive}">✏️</button>
+                                <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post" th:id="'del-user-' + ${user.id}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            th:data-form-id="'del-user-' + ${user.id}"
+                                            th:data-username="${user.username}"
+                                            onclick="confirmDelete(this.getAttribute('data-form-id'), this.getAttribute('data-username'))">🗑</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal-overlay" id="add-user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">➕ Tambah User Baru</div>
+                <button class="modal-close" onclick="Modal.close('add-user-modal')">×</button>
+            </div>
+            <form th:action="@{/users/add}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Username *</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password *</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nama Lengkap *</label>
+                        <input type="text" class="form-control" name="fullName" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telepon</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role *</label>
+                        <select class="form-control" name="role.id" required>
+                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Role</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('add-user-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="edit-user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit User</div>
+                <button class="modal-close" onclick="Modal.close('edit-user-modal')">×</button>
+            </div>
+            <form id="edit-user-form" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Nama Lengkap *</label>
+                        <input type="text" class="form-control" name="fullName" id="edit-fullname" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="edit-email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telepon</label>
+                            <input type="text" class="form-control" name="phone" id="edit-phone">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select class="form-control" name="role.id" id="edit-role">
+                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Role</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" name="isActive" id="edit-active">
+                            <option value="true">Aktif</option>
+                            <option value="false">Nonaktif</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password Baru (kosongkan jika tidak diubah)</label>
+                        <input type="password" class="form-control" name="password" placeholder="Password baru...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('edit-user-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+<script>
+function openEditUser(btn) {
+    document.getElementById('edit-fullname').value = btn.getAttribute('data-fullname') || '';
+    document.getElementById('edit-email').value = btn.getAttribute('data-email') || '';
+    document.getElementById('edit-phone').value = btn.getAttribute('data-phone') || '';
+    document.getElementById('edit-role').value = btn.getAttribute('data-role');
+    document.getElementById('edit-active').value = btn.getAttribute('data-active') === 'true' ? 'true' : 'false';
+    document.getElementById('edit-user-form').action = `/users/edit/${btn.getAttribute('data-id')}`;
+    Modal.open('edit-user-modal');
+}
+</script>
+</th:block>
+
+</body>
+</html>

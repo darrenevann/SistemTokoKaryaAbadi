@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!--
+  BASE LAYOUT FRAGMENT
+  Usage in child templates:
+    th:replace="~{layout/base :: layout(pageTitle='...',activePage='...',content=~{::main-content},extraScripts=~{::scripts})}"
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Karya Abadi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<th:block th:fragment="layout(pageTitle, activePage, content, extraScripts)">
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' — Toko Karya Abadi' : 'Toko Karya Abadi'}">Toko Karya Abadi</title>
+    <meta name="description" content="Sistem Manajemen Toko Modern Karya Abadi">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">🏪</div>
+            <div class="sidebar-brand-text">
+                <h1>Toko Karya Abadi</h1>
+                <span>Retail Management System</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Menu Utama</div>
+                <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? ' active'" class="nav-link">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a th:href="@{/pos}" th:classappend="${activePage == 'pos'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR')">
+                    <span class="nav-icon">🛒</span> Point of Sale
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Produk & Stok</div>
+                <a th:href="@{/products}" th:classappend="${activePage == 'products'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">📦</span> Master Barang
+                </a>
+                <a th:href="@{/products/categories}" th:classappend="${activePage == 'categories'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">🏷️</span> Kategori
+                </a>
+                <a th:href="@{/stock}" th:classappend="${activePage == 'stock'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">📥</span> Penerimaan Stok
+                </a>
+                <a th:href="@{/damaged}" th:classappend="${activePage == 'damaged'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">⚠️</span> Barang Rusak
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Transaksi</div>
+                <a th:href="@{/sales}" th:classappend="${activePage == 'sales'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">🧾</span> Riwayat Penjualan
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Master Data</div>
+                <a th:href="@{/suppliers}" th:classappend="${activePage == 'suppliers'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">🏭</span> Supplier
+                </a>
+                <a th:href="@{/price-history}" th:classappend="${activePage == 'price-history'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">💲</span> Riwayat Harga
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Laporan</div>
+                <a th:href="@{/reports/daily}" th:classappend="${activePage == 'reports'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','OWNER')">
+                    <span class="nav-icon">📈</span> Laporan Harian
+                </a>
+            </div>
+
+            <div class="nav-section" sec:authorize="hasRole('ADMIN')">
+                <div class="nav-section-title">Administrasi</div>
+                <a th:href="@{/users}" th:classappend="${activePage == 'users'} ? ' active'" class="nav-link">
+                    <span class="nav-icon">👥</span> Manajemen User
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar"
+                     th:text="${#authentication != null and #authentication.name != null ? #authentication.name.substring(0,1).toUpperCase() : 'U'}">A</div>
+                <div class="user-info">
+                    <div class="user-name"
+                         th:text="${#authentication != null ? #authentication.name : 'User'}">Admin</div>
+                    <div class="user-role" sec:authorize="hasRole('ADMIN')">Administrator</div>
+                    <div class="user-role" sec:authorize="hasRole('KASIR')">Kasir</div>
+                    <div class="user-role" sec:authorize="hasRole('OWNER')">Owner</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <header class="top-navbar">
+            <button id="sidebar-toggle" class="navbar-btn" title="Toggle Sidebar">☰</button>
+            <div class="navbar-title" th:text="${pageTitle ?: 'Dashboard'}">Dashboard</div>
+
+            <div class="navbar-actions" style="margin-left:auto">
+                <span class="navbar-time" id="live-clock">00:00:00</span>
+                <a th:href="@{/pos}" class="navbar-btn" title="Kasir POS" sec:authorize="hasAnyRole('ADMIN','KASIR')">🛒</a>
+                <form th:action="@{/logout}" method="post" style="display:inline;margin:0">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="navbar-btn" title="Logout">🚪</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Flash messages hidden divs for JS toast -->
+        <div th:if="${successMessage}" th:attr="data-flash-success=${successMessage}" style="display:none"></div>
+        <div th:if="${errorMessage}" th:attr="data-flash-error=${errorMessage}" style="display:none"></div>
+
+        <main class="page-content">
+            <th:block th:replace="${content}"/>
+        </main>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+<script th:src="@{/js/app.js}"></script>
+<th:block th:replace="${extraScripts} ?: ~{}"/>
+</body>
+</html>
+</th:block>
+
+</body>
+</html>

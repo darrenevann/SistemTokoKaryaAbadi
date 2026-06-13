@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Supplier', activePage='suppliers', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Supplier</span>
+            </div>
+            <h2>🏭 Manajemen Supplier</h2>
+            <p>Kelola data supplier dan mitra bisnis toko</p>
+        </div>
+        <button class="btn btn-primary" onclick="Modal.open('add-supplier-modal')">➕ Tambah Supplier</button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Daftar Supplier (<span th:text="${suppliers.size()}">0</span>)</div>
+            <div class="search-box">
+                <span class="search-box-icon">🔍</span>
+                <input type="text" placeholder="Cari supplier..." id="supplier-search" onkeyup="filterTable()">
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table id="supplier-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Supplier</th>
+                        <th>Telepon</th>
+                        <th>Email</th>
+                        <th>Alamat</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${suppliers.isEmpty()}">
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏭</div>
+                                <h3>Belum Ada Supplier</h3>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="supplier, iter : ${suppliers}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <div style="font-weight:600" th:text="${supplier.name}">Supplier</div>
+                        </td>
+                        <td th:text="${supplier.phone ?: '-'}">-</td>
+                        <td th:text="${supplier.email ?: '-'}">-</td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                            th:text="${supplier.address ?: '-'}">-</td>
+                        <td>
+                            <span class="badge badge-success" th:if="${supplier.isActive}">Aktif</span>
+                            <span class="badge badge-danger" th:unless="${supplier.isActive}">Nonaktif</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-warning btn-sm"
+                                        onclick="openEditModal(this)"
+                                        th:data-id="${supplier.id}"
+                                        th:data-name="${supplier.name}"
+                                        th:data-phone="${supplier.phone}"
+                                        th:data-email="${supplier.email}"
+                                        th:data-address="${supplier.address}"
+                                        th:data-active="${supplier.isActive}">✏️</button>
+                                <form th:action="@{/suppliers/delete/{id}(id=${supplier.id})}" method="post" th:id="'del-sup-' + ${supplier.id}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            th:data-form-id="'del-sup-' + ${supplier.id}"
+                                            th:data-name="${supplier.name}"
+                                            onclick="confirmDelete(this.getAttribute('data-form-id'), this.getAttribute('data-name'))">🗑</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div class="modal-overlay" id="add-supplier-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">➕ Tambah Supplier</div>
+                <button class="modal-close" onclick="Modal.close('add-supplier-modal')">×</button>
+            </div>
+            <form th:action="@{/suppliers/add}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Nama Supplier *</label>
+                        <input type="text" class="form-control" name="name" placeholder="Nama perusahaan/toko..." required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">No. Telepon</label>
+                            <input type="text" class="form-control" name="phone" placeholder="08xxxxxxxxxx">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" placeholder="email@supplier.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" name="address" rows="2" placeholder="Alamat lengkap supplier..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('add-supplier-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Supplier Modal -->
+    <div class="modal-overlay" id="edit-supplier-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit Supplier</div>
+                <button class="modal-close" onclick="Modal.close('edit-supplier-modal')">×</button>
+            </div>
+            <form id="edit-supplier-form" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Nama Supplier *</label>
+                        <input type="text" class="form-control" name="name" id="edit-supplier-name" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">No. Telepon</label>
+                            <input type="text" class="form-control" name="phone" id="edit-supplier-phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="edit-supplier-email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" name="address" id="edit-supplier-address" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" name="isActive" id="edit-supplier-active">
+                            <option value="true">Aktif</option>
+                            <option value="false">Nonaktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('edit-supplier-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+<script>
+function openEditModal(btn) {
+    document.getElementById('edit-supplier-name').value = btn.getAttribute('data-name') || '';
+    document.getElementById('edit-supplier-phone').value = btn.getAttribute('data-phone') || '';
+    document.getElementById('edit-supplier-email').value = btn.getAttribute('data-email') || '';
+    document.getElementById('edit-supplier-address').value = btn.getAttribute('data-address') || '';
+    document.getElementById('edit-supplier-active').value = btn.getAttribute('data-active') === 'true' ? 'true' : 'false';
+    document.getElementById('edit-supplier-form').action = `/suppliers/edit/${btn.getAttribute('data-id')}`;
+    Modal.open('edit-supplier-modal');
+}
+
+function filterTable() {
+    const query = document.getElementById('supplier-search').value.toLowerCase();
+    document.querySelectorAll('#supplier-table tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+}
+</script>
+</th:block>
+
+</body>
+</html>

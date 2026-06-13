@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Penerimaan Stok', activePage='stock', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Penerimaan Stok</span>
+            </div>
+            <h2>📥 Penerimaan Stok</h2>
+            <p>Catat penerimaan barang dari supplier</p>
+        </div>
+        <a th:href="@{/stock/receive}" class="btn btn-primary">➕ Terima Stok Baru</a>
+    </div>
+
+    <!-- Stock History Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📋 Riwayat Penerimaan Stok</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>No. Invoice</th>
+                        <th>Supplier</th>
+                        <th>Diterima Oleh</th>
+                        <th>Tanggal</th>
+                        <th>Total Nilai</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${stockIns.isEmpty()}">
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📥</div>
+                                <h3>Belum Ada Penerimaan Stok</h3>
+                                <p>Tambahkan penerimaan stok pertama</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="stockIn, iter : ${stockIns}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:12px"
+                                  th:text="${stockIn.invoiceNumber}">STK-000</code>
+                        </td>
+                        <td>
+                            <div style="font-weight:600" th:text="${stockIn.supplier.name}">Supplier</div>
+                        </td>
+                        <td th:text="${stockIn.user.fullName}">Admin</td>
+                        <td th:text="${#temporals.format(stockIn.receivedAt, 'dd MMM yyyy')}">-</td>
+                        <td>
+                            <span style="font-weight:600;color:var(--accent)"
+                                  th:text="'Rp ' + ${#numbers.formatDecimal(stockIn.totalAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:12px" th:text="${stockIn.notes ?: '-'}">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts"></th:block>
+</body>
+</html>

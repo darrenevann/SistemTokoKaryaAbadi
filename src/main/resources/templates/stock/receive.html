@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Terima Stok', activePage='stock', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span>
+                <a th:href="@{/stock}">Penerimaan Stok</a> <span class="breadcrumb-sep">›</span>
+                <span>Terima Stok Baru</span>
+            </div>
+            <h2>➕ Terima Stok Baru</h2>
+        </div>
+        <a th:href="@{/stock}" class="btn btn-ghost">← Kembali</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📥 Form Penerimaan Stok</div>
+        </div>
+        <div class="card-body">
+            <div class="grid-2" style="margin-bottom:20px">
+                <div class="form-group">
+                    <label class="form-label">Supplier *</label>
+                    <select class="form-control" id="supplier-id" required>
+                        <option value="">-- Pilih Supplier --</option>
+                        <option th:each="sup : ${suppliers}" th:value="${sup.id}" th:text="${sup.name}">Supplier</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tanggal Penerimaan *</label>
+                    <input type="date" class="form-control" id="received-at" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Catatan</label>
+                <input type="text" class="form-control" id="stock-notes" placeholder="Catatan penerimaan...">
+            </div>
+
+            <div style="border-top:1px solid var(--gray-200);padding-top:16px;margin-top:8px">
+                <div class="d-flex justify-between align-center" style="margin-bottom:12px">
+                    <label class="form-label" style="margin:0">Daftar Barang Diterima</label>
+                    <button type="button" class="btn btn-success btn-sm" onclick="StockManager.addItem()">
+                        ➕ Tambah Barang
+                    </button>
+                </div>
+
+                <!-- Column headers -->
+                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:10px; margin-bottom:8px; padding:8px 0; border-bottom:2px solid var(--gray-200);">
+                    <span class="form-label" style="margin:0">Produk</span>
+                    <span class="form-label" style="margin:0">Jumlah</span>
+                    <span class="form-label" style="margin:0">Harga Beli (Rp)</span>
+                    <span class="form-label" style="margin:0">Kadaluarsa</span>
+                    <span></span>
+                </div>
+
+                <div id="stock-items-container">
+                    <p class="text-muted text-center" style="padding:16px">Klik "+ Tambah Barang" untuk mulai</p>
+                </div>
+            </div>
+
+            <div class="d-flex justify-between align-center" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)">
+                <div></div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/stock}" class="btn btn-ghost">Batal</a>
+                    <button type="button" class="btn btn-primary" onclick="StockManager.submit(event)">
+                        💾 Simpan Penerimaan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+<script th:src="@{/js/stock.js}"></script>
+<script th:inline="javascript">
+    const productsData = [[${products}]].map(p => ({
+        id: p.id,
+        barcode: p.barcode,
+        name: p.name,
+        buyPrice: p.buyPrice
+    }));
+    StockManager.init(productsData);
+</script>
+</th:block>
+</body>
+</html>

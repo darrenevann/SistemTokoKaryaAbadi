@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Struk - ' + ${sale.invoiceNumber}">Struk</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body { background: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
+        .receipt-container { background: white; padding: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .receipt-container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Print Actions -->
+<div class="no-print" style="text-align:center;margin-bottom:20px">
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Cetak Struk</button>
+    <button onclick="window.close()" class="btn btn-ghost" style="margin-left:8px">✕ Tutup</button>
+</div>
+
+<div class="receipt-container">
+    <div class="receipt">
+        <!-- Header -->
+        <div class="receipt-header">
+            <div class="receipt-store-name" th:text="${storeName}">Toko Karya Abadi</div>
+            <div th:text="${storeAddress}">Alamat Toko</div>
+            <div th:text="'Telp: ' + ${storePhone}">Telp: -</div>
+        </div>
+
+        <!-- Transaction Info -->
+        <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between">
+                <span>No. Invoice:</span>
+                <strong th:text="${sale.invoiceNumber}">-</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+                <span>Tanggal:</span>
+                <span th:text="${#temporals.format(sale.soldAt, 'dd/MM/yyyy HH:mm')}">-</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+                <span>Kasir:</span>
+                <span th:text="${sale.user.fullName}">-</span>
+            </div>
+        </div>
+
+        <hr class="receipt-divider">
+
+        <!-- Items -->
+        <div th:each="detail : ${sale.details}">
+            <div class="receipt-item">
+                <span th:text="${detail.product.name}">Produk</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:0 0 6px 16px;font-size:12px">
+                <span th:text="${detail.quantity} + ' x Rp ' + ${#numbers.formatDecimal(detail.sellPrice, 1, 'COMMA', 0, 'POINT')}">-</span>
+                <span th:text="'Rp ' + ${#numbers.formatDecimal(detail.subtotal, 1, 'COMMA', 0, 'POINT')}">0</span>
+            </div>
+        </div>
+
+        <hr class="receipt-divider">
+
+        <!-- Totals -->
+        <div th:if="${sale.discount.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+            <div class="receipt-total">
+                <span>Diskon:</span>
+                <span th:text="'Rp ' + ${#numbers.formatDecimal(sale.discount, 1, 'COMMA', 0, 'POINT')}">0</span>
+            </div>
+        </div>
+
+        <div class="receipt-total" style="font-size:15px;border-top:2px solid #333;padding-top:8px">
+            <span>TOTAL:</span>
+            <span th:text="'Rp ' + ${#numbers.formatDecimal(sale.totalAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+        </div>
+        <div class="receipt-total">
+            <span>Bayar (<span th:text="${sale.paymentMethod}">CASH</span>):</span>
+            <span th:text="'Rp ' + ${#numbers.formatDecimal(sale.paidAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+        </div>
+        <div class="receipt-total" style="font-size:15px">
+            <span>KEMBALI:</span>
+            <span th:text="'Rp ' + ${#numbers.formatDecimal(sale.changeAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="receipt-footer">
+            <p>Terima kasih telah berbelanja!</p>
+            <p th:text="${storeName}">Toko Karya Abadi</p>
+            <p style="font-size:10px;margin-top:8px">Barang yang sudah dibeli tidak dapat dikembalikan</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

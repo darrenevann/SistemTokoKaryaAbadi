@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Riwayat Harga', activePage='price-history', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Riwayat Harga</span>
+            </div>
+            <h2>💲 Riwayat Perubahan Harga</h2>
+            <p>Audit trail semua perubahan harga produk</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📋 Log Perubahan Harga</div>
+            <div style="font-size:12px;color:var(--text-muted)" th:text="${priceHistories.size()} + ' record ditemukan'">0 record</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Produk</th>
+                        <th>Harga Beli Lama</th>
+                        <th>Harga Beli Baru</th>
+                        <th>Harga Jual Lama</th>
+                        <th>Harga Jual Baru</th>
+                        <th>Diubah Oleh</th>
+                        <th>Alasan</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${priceHistories.isEmpty()}">
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">💲</div>
+                                <h3>Belum Ada Perubahan Harga</h3>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="ph, iter : ${priceHistories}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <div style="font-weight:600" th:text="${ph.product.name}">Produk</div>
+                            <code style="font-size:11px;color:var(--text-muted)" th:text="${ph.product.barcode}">000</code>
+                        </td>
+                        <td class="text-muted text-sm" th:text="'Rp ' + ${#numbers.formatDecimal(ph.oldBuyPrice ?: 0, 1, 'COMMA', 0, 'POINT')}">-</td>
+                        <td>
+                            <span th:class="${ph.newBuyPrice > ph.oldBuyPrice} ? 'text-danger fw-600' : 'text-success fw-600'"
+                                  th:text="'Rp ' + ${#numbers.formatDecimal(ph.newBuyPrice ?: 0, 1, 'COMMA', 0, 'POINT')}">-</span>
+                        </td>
+                        <td class="text-muted text-sm" th:text="'Rp ' + ${#numbers.formatDecimal(ph.oldSellPrice, 1, 'COMMA', 0, 'POINT')}">-</td>
+                        <td>
+                            <span th:class="${ph.newSellPrice > ph.oldSellPrice} ? 'text-danger fw-600' : 'text-success fw-600'"
+                                  th:text="'Rp ' + ${#numbers.formatDecimal(ph.newSellPrice, 1, 'COMMA', 0, 'POINT')}">-</span>
+                        </td>
+                        <td th:text="${ph.user.fullName}">Admin</td>
+                        <td style="font-size:12px;color:var(--text-muted)" th:text="${ph.reason ?: '-'}">-</td>
+                        <td style="font-size:12px;white-space:nowrap"
+                            th:text="${#temporals.format(ph.changedAt, 'dd MMM yyyy HH:mm')}">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts"></th:block>
+</body>
+</html>

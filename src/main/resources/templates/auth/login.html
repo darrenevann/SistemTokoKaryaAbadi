@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Toko Karya Abadi</title>
+    <meta name="description" content="Login ke Sistem Manajemen Toko Karya Abadi">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+</head>
+
+<body>
+
+    <div class="login-page">
+        <!-- LEFT PANEL -->
+        <div class="login-left">
+            <div class="login-branding">
+                <div class="login-logo">🏪</div>
+                <h1>Toko Karya Abadi</h1>
+                <p>Sistem Manajemen Toko Modern<br>yang handal, cepat, dan mudah digunakan</p>
+
+                <div class="login-features">
+                    <div class="login-feature">
+                        <div class="login-feature-icon">🛒</div>
+                        <span>Point of Sale (POS) terintegrasi dengan scan barcode</span>
+                    </div>
+                    <div class="login-feature">
+                        <div class="login-feature-icon">📦</div>
+                        <span>Manajemen stok real-time dan otomatis</span>
+                    </div>
+                    <div class="login-feature">
+                        <div class="login-feature-icon">📈</div>
+                        <span>Laporan penjualan & analitik bisnis harian</span>
+                    </div>
+                    <div class="login-feature">
+                        <div class="login-feature-icon">🔐</div>
+                        <span>Multi-role: Admin, Kasir, dan Owner</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL (Login Form) -->
+        <div class="login-right">
+            <div class="login-form-wrapper">
+                <h2>Selamat Datang 👋</h2>
+                <p>Masuk ke akun Anda untuk melanjutkan</p>
+
+                <!-- Error Alert -->
+                <div th:if="${errorMessage}" class="login-alert login-alert-error">
+                    ⚠️ <span th:text="${errorMessage}">Login gagal</span>
+                </div>
+
+                <!-- Success/Logout Alert -->
+                <div th:if="${logoutMessage}" class="login-alert login-alert-success">
+                    ✅ <span th:text="${logoutMessage}">Logout berhasil</span>
+                </div>
+
+                <form th:action="@{/login}" method="post" id="login-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <div class="login-input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="login-input"
+                            placeholder="Masukkan username..." autocomplete="username" required autofocus>
+                    </div>
+
+                    <div class="login-input-group">
+                        <label for="password">Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" class="login-input"
+                                placeholder="Masukkan password..." autocomplete="current-password" required>
+                            <button type="button" onclick="togglePassword()"
+                                style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;"
+                                id="pwd-toggle">👁</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="login-btn">
+                        🔑 Masuk Sekarang
+                    </button>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const btn = document.getElementById('pwd-toggle');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                pwd.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function () {
+            const btn = document.getElementById('login-btn');
+            btn.textContent = '⏳ Memverifikasi...';
+            btn.disabled = true;
+        });
+    </script>
+
+</body>
+
+</html>

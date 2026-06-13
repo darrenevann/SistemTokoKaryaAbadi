@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(pageTitle='Kategori', activePage='categories', content=~{::main-content}, extraScripts=~{::scripts})}">
+<head></head>
+<body>
+
+<main th:fragment="main-content">
+    <div class="page-header">
+        <div class="page-header-info">
+            <div class="breadcrumb">
+                <a th:href="@{/dashboard}">🏠 Dashboard</a>
+                <span class="breadcrumb-sep">›</span>
+                <a th:href="@{/products}">Master Barang</a>
+                <span class="breadcrumb-sep">›</span>
+                <span>Kategori</span>
+            </div>
+            <h2>🏷️ Manajemen Kategori</h2>
+        </div>
+        <button class="btn btn-primary" onclick="Modal.open('add-category-modal')">➕ Tambah Kategori</button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Daftar Kategori (<span th:text="${categories.size()}">0</span>)</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Kategori</th>
+                        <th>Deskripsi</th>
+                        <th>Dibuat</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cat, iter : ${categories}">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <span class="badge badge-primary" th:text="${cat.name}">Kategori</span>
+                        </td>
+                        <td th:text="${cat.description ?: '-'}">-</td>
+                        <td style="font-size:12px;color:var(--text-muted)"
+                            th:text="${#temporals.format(cat.createdAt, 'dd MMM yyyy')}">-</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" 
+                                    th:data-id="${cat.id}"
+                                    th:data-name="${cat.name}"
+                                    th:data-desc="${cat.description}"
+                                    onclick="editCategory(this)">✏️ Edit</button>
+                            <form th:action="@{/products/categories/delete/{id}(id=${cat.id})}" method="post" style="display:inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori ini?');">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑 Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal-overlay" id="add-category-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">➕ Tambah Kategori</div>
+                <button class="modal-close" onclick="Modal.close('add-category-modal')">×</button>
+            </div>
+            <form th:action="@{/products/categories/add}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Nama Kategori *</label>
+                        <input type="text" class="form-control" name="name" placeholder="Contoh: Minuman Kemasan" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <input type="text" class="form-control" name="description" placeholder="Deskripsi kategori...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('add-category-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Category Modal -->
+    <div class="modal-overlay" id="edit-category-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit Kategori</div>
+                <button class="modal-close" onclick="Modal.close('edit-category-modal')">×</button>
+            </div>
+            <form id="edit-category-form" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Nama Kategori *</label>
+                        <input type="text" class="form-control" name="name" id="edit-category-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <input type="text" class="form-control" name="description" id="edit-category-description">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="Modal.close('edit-category-modal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+    <script>
+        function editCategory(btn) {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const description = btn.getAttribute('data-desc');
+            document.getElementById('edit-category-form').action = '/products/categories/edit/' + id;
+            document.getElementById('edit-category-name').value = name;
+            document.getElementById('edit-category-description').value = description || '';
+            Modal.open('edit-category-modal');
+        }
+    </script>
+</th:block>
+</body>
+</html>
