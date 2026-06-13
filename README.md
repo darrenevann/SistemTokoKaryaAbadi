@@ -1,6 +1,3 @@
-Ini adalah versi **README.md** yang profesional, terstruktur, dan siap pakai. Kamu bisa langsung menyalin teks di bawah ini ke file `README.md` milikmu.
-
----
 
 # Toko Karya Abadi - Modern Retail Management System
 
