@@ -1,125 +1,137 @@
 <!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/base :: layout(pageTitle='Barang Rusak', activePage='damaged', content=~{::main-content}, extraScripts=~{::scripts})}">
+    th:replace="~{layout/base :: layout(pageTitle='Barang Rusak', activePage='damaged', content=~{::main-content}, extraScripts=~{::scripts})}">
+
 <head></head>
+
 <body>
 
-<main th:fragment="main-content">
-    <div class="page-header">
-        <div class="page-header-info">
-            <div class="breadcrumb">
-                <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Barang Rusak</span>
+    <main th:fragment="main-content">
+        <div class="page-header">
+            <div class="page-header-info">
+                <div class="breadcrumb">
+                    <a th:href="@{/dashboard}">🏠 Dashboard</a> <span class="breadcrumb-sep">›</span> <span>Barang
+                        Rusak</span>
+                </div>
+                <h2>⚠️ Barang Rusak / Kadaluarsa</h2>
+                <p>Catat dan pantau barang yang rusak, kadaluarsa, atau hilang</p>
             </div>
-            <h2>⚠️ Barang Rusak / Kadaluarsa</h2>
-            <p>Catat dan pantau barang yang rusak, kadaluarsa, atau hilang</p>
+            <button class="btn btn-danger" onclick="Modal.open('report-damaged-modal')">⚠️ Laporkan Barang
+                Rusak</button>
         </div>
-        <button class="btn btn-danger" onclick="Modal.open('report-damaged-modal')">⚠️ Laporkan Barang Rusak</button>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">📋 Riwayat Barang Rusak</div>
-        </div>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Produk</th>
-                        <th>Jenis</th>
-                        <th>Jumlah</th>
-                        <th>Kerugian</th>
-                        <th>Keterangan</th>
-                        <th>Dilaporkan Oleh</th>
-                        <th>Tanggal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${damagedProducts.isEmpty()}">
-                        <td colspan="8">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">✅</div>
-                                <h3>Tidak Ada Laporan</h3>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:each="dp, iter : ${damagedProducts}">
-                        <td th:text="${iter.count}">1</td>
-                        <td>
-                            <div style="font-weight:600" th:text="${dp.product.name}">Produk</div>
-                            <div class="text-muted text-sm" th:text="${dp.product.barcode}">000</div>
-                        </td>
-                        <td>
-                            <span th:class="${dp.reason == 'DAMAGED'} ? 'badge badge-danger' : (${dp.reason == 'EXPIRED'} ? 'badge badge-warning' : 'badge badge-gray')"
-                                  th:text="${dp.reason == 'DAMAGED'} ? 'Rusak' : (${dp.reason == 'EXPIRED'} ? 'Kadaluarsa' : 'Hilang')">-</span>
-                        </td>
-                        <td th:text="${dp.quantity} + ' ' + ${dp.product.unit}">0</td>
-                        <td>
-                            <span style="color:var(--danger);font-weight:600"
-                                  th:text="'Rp ' + ${#numbers.formatDecimal(dp.lossAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
-                        </td>
-                        <td style="font-size:12px;color:var(--text-muted)" th:text="${dp.description ?: '-'}">-</td>
-                        <td th:text="${dp.user.fullName}">Admin</td>
-                        <td style="font-size:12px" th:text="${#temporals.format(dp.reportedAt, 'dd MMM yyyy')}">-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Report Damaged Modal -->
-    <div class="modal-overlay" id="report-damaged-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">⚠️ Laporkan Barang Rusak</div>
-                <button class="modal-close" onclick="Modal.close('report-damaged-modal')">×</button>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📋 Riwayat Barang Rusak</div>
             </div>
-            <form th:action="@{/damaged/report}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Produk *</label>
-                        <select class="form-control" name="productId" required>
-                            <option value="">-- Pilih Produk --</option>
-                            <option th:each="p : ${products}" th:value="${p.id}"
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Produk</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Kerugian</th>
+                            <th>Keterangan</th>
+                            <th>Dilaporkan Oleh</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${damagedProducts.isEmpty()}">
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">✅</div>
+                                    <h3>Tidak Ada Laporan</h3>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:each="dp, iter : ${damagedProducts}">
+                            <td th:text="${iter.count}">1</td>
+                            <td>
+                                <div style="font-weight:600" th:text="${dp.product.name}">Produk</div>
+                                <div class="text-muted text-sm" th:text="${dp.product.barcode}">000</div>
+                            </td>
+                            <td>
+                                <span
+                                    th:class="${dp.reason == 'DAMAGED'} ? 'badge badge-danger' : (${dp.reason == 'EXPIRED'} ? 'badge badge-warning' : 'badge badge-gray')"
+                                    th:text="${dp.reason == 'DAMAGED'} ? 'Rusak' : (${dp.reason == 'EXPIRED'} ? 'Kadaluarsa' : 'Hilang')">-</span>
+                            </td>
+                            <td th:text="${dp.quantity} + ' ' + ${dp.product.unit}">0</td>
+                            <td>
+                                <span style="color:var(--danger);font-weight:600"
+                                    th:text="'Rp ' + ${#numbers.formatDecimal(dp.lossAmount, 1, 'COMMA', 0, 'POINT')}">0</span>
+                            </td>
+                            <td style="font-size:12px;color:var(--text-muted)" th:text="${dp.description ?: '-'}">-</td>
+                            <td th:text="${dp.user.fullName}">Admin</td>
+                            <td style="font-size:12px" th:text="${#temporals.format(dp.reportedAt, 'dd MMM yyyy')}">-
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Report Damaged Modal -->
+        <div class="modal-overlay" id="report-damaged-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">⚠️ Laporkan Barang Rusak</div>
+                    <button class="modal-close" onclick="Modal.close('report-damaged-modal')">×</button>
+                </div>
+                <form th:action="@{/damaged/report}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Produk *</label>
+                            <select class="form-control" name="productId" required>
+                                <option value="">-- Pilih Produk --</option>
+                                <option th:each="p : ${products}" th:value="${p.id}"
                                     th:text="${p.name} + ' (Stok: ' + ${p.stock} + ')'">Produk</option>
-                        </select>
-                    </div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Jumlah *</label>
-                            <input type="number" class="form-control" name="quantity" placeholder="0" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Jenis Kerusakan *</label>
-                            <select class="form-control" name="reason" required>
-                                <option value="DAMAGED">🔴 Rusak</option>
-                                <option value="EXPIRED">🟡 Kadaluarsa</option>
-                                <option value="LOST">⚫ Hilang</option>
                             </select>
                         </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Jumlah *</label>
+                                <input type="number" class="form-control" name="quantity" placeholder="0" min="1"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Jenis Kerusakan *</label>
+                                <select class="form-control" name="reason" required>
+                                    <option value="DAMAGED">🔴 Rusak</option>
+                                    <option value="EXPIRED">🟡 Kadaluarsa</option>
+                                    <option value="LOST">⚫ Hilang</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tanggal Laporan</label>
+                            <input type="date" class="form-control" name="reportedAt"
+                                th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Keterangan</label>
+                            <textarea class="form-control" name="description" rows="2"
+                                placeholder="Detail kerusakan..."></textarea>
+                        </div>
+                        <div class="alert alert-warning">
+                            ⚠️ Stok produk akan dikurangi secara otomatis sesuai jumlah yang dilaporkan.
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Tanggal Laporan</label>
-                        <input type="date" class="form-control" name="reportedAt" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost"
+                            onclick="Modal.close('report-damaged-modal')">Batal</button>
+                        <button type="submit" class="btn btn-danger">⚠️ Laporkan</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Keterangan</label>
-                        <textarea class="form-control" name="description" rows="2" placeholder="Detail kerusakan..."></textarea>
-                    </div>
-                    <div class="alert alert-warning">
-                        ⚠️ Stok produk akan dikurangi secara otomatis sesuai jumlah yang dilaporkan.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-ghost" onclick="Modal.close('report-damaged-modal')">Batal</button>
-                    <button type="submit" class="btn btn-danger">⚠️ Laporkan</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<th:block th:fragment="scripts"></th:block>
+    <th:block th:fragment="scripts"></th:block>
 </body>
+
 </html>

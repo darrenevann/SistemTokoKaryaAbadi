@@ -248,37 +248,3 @@
         TRUE
     );
 
-    -- ============================================================
-    -- SEED DATA: Categories
-    -- ============================================================
-    INSERT IGNORE INTO categories (name, description) VALUES
-    ('Makanan & Minuman', 'Produk makanan dan minuman'),
-    ('Kebutuhan Rumah Tangga', 'Produk rumah tangga'),
-    ('Kebersihan & Perawatan', 'Produk kebersihan dan perawatan diri'),
-    ('Elektronik', 'Produk elektronik dan aksesoris'),
-    ('Alat Tulis', 'Alat tulis dan perlengkapan kantor'),
-    ('Frozen Food', 'Makanan beku'),
-    ('Snack & Permen', 'Makanan ringan dan permen'),
-    ('Minuman Kemasan', 'Minuman botol dan kemasan');
-
-    -- ============================================================
-    -- SEED DATA: Suppliers
-    -- ============================================================
-    INSERT IGNORE INTO suppliers (name, phone, email, address) VALUES
-    ('PT Indofood', '021-7534xxx', 'sales@indofood.co.id', 'Jakarta Selatan, DKI Jakarta'),
-    ('PT Unilever Indonesia', '021-5299xxxx', 'contact@unilever.co.id', 'Tangerang, Banten'),
-    ('CV Berkah Jaya', '0274-512xxx', 'berkah@email.com', 'Yogyakarta, DIY'),
-    ('UD Sumber Rejeki', '031-845xxxx', 'sumber@email.com', 'Surabaya, Jawa Timur');
-
-    -- ============================================================
-    -- SEED DATA: Sample Products
-    -- ============================================================
-    INSERT IGNORE INTO products (barcode, name, category_id, buy_price, sell_price, stock, min_stock, unit) VALUES
-    ('8999999820112', 'Indomie Goreng', 1, 2800, 3500, 100, 20, 'pcs'),
-    ('8992388505018', 'Aqua 600ml', 1, 2000, 3000, 150, 30, 'pcs'),
-    ('8991102100015', 'Sabun Lifebuoy 90gr', 3, 3500, 5000, 50, 10, 'pcs'),
-    ('8997023440027', 'Chitato BBQ 55gr', 7, 6500, 9000, 80, 15, 'pcs'),
-    ('8999999010028', 'Teh Botol Sosro 450ml', 8, 4000, 6000, 120, 25, 'pcs'),
-    ('8991102150039', 'Pepsodent 120gr', 3, 8000, 12000, 40, 10, 'pcs'),
-    ('8998866240040', 'Rinso Anti Noda 1kg', 2, 18000, 24000, 30, 8, 'pcs'),
-    ('8997023110051', 'Oreo 119gr', 7, 9000, 13000, 60, 12, 'pcs');

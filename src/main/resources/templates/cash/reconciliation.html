@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/base :: layout(pageTitle='Rekonsiliasi Kas', activePage='cash', content=~{::main-content}, extraScripts=~{})}">
+
+<body>
+    <main th:fragment="main-content">
+        <div class="page-header">
+            <div class="page-header-info">
+                <h2>💰 Rekonsiliasi Kas</h2>
+                <p>Pencatatan dan pencocokan uang kas harian</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Form Tambah -->
+            <div class="card" style="align-self: start;">
+                <div class="card-header">
+                    <div class="card-title">📝 Buat Rekonsiliasi Baru</div>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/cash/reconciliation}" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Tanggal Rekonsiliasi</label>
+                            <input type="date" name="date" class="form-control" th:value="${today}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Uang Kas Aktual (Fisik Laci)</label>
+                            <input type="number" name="actualCash" class="form-control" placeholder="Contoh: 1500000"
+                                min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catatan Tambahan (Opsional)</label>
+                            <textarea name="notes" class="form-control" rows="3"
+                                placeholder="Tambahkan keterangan jika ada selisih..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary"
+                            style="width:100%; justify-content:center; margin-top:8px;">
+                            💾 Simpan Rekonsiliasi
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabel Riwayat -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 Riwayat Rekonsiliasi</div>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kas Tercatat</th>
+                                    <th>Kas Aktual</th>
+                                    <th>Selisih</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(reconciliations)}">
+                                    <td colspan="5" class="text-center text-muted">Belum ada data rekonsiliasi.</td>
+                                </tr>
+                                <tr th:each="r : ${reconciliations}">
+                                    <td th:text="${#temporals.format(r.reconciliationDate, 'dd MMM yyyy')}">01 Jan 2026
+                                    </td>
+                                    <td
+                                        th:text="${'Rp ' + #numbers.formatDecimal(r.expectedCash, 0, 'COMMA', 0, 'POINT')}">
+                                        Rp 0</td>
+                                    <td
+                                        th:text="${'Rp ' + #numbers.formatDecimal(r.actualCash, 0, 'COMMA', 0, 'POINT')}">
+                                        Rp 0</td>
+                                    <td
+                                        th:text="${'Rp ' + #numbers.formatDecimal(r.difference, 0, 'COMMA', 0, 'POINT')}">
+                                        Rp 0</td>
+                                    <td>
+                                        <span th:if="${r.status == 'MATCH'}" class="badge badge-success">Sesuai</span>
+                                        <span th:if="${r.status == 'OVER'}" class="badge badge-info">Lebih</span>
+                                        <span th:if="${r.status == 'SHORT'}" class="badge badge-danger">Kurang</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

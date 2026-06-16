@@ -98,6 +98,10 @@
                    sec:authorize="hasAnyRole('ADMIN','OWNER')">
                     <span class="nav-icon">📈</span> Laporan Harian
                 </a>
+                <a th:href="@{/cash/reconciliation}" th:classappend="${activePage == 'cash'} ? ' active'" class="nav-link"
+                   sec:authorize="hasAnyRole('ADMIN','KASIR','OWNER')">
+                    <span class="nav-icon">💰</span> Rekonsiliasi Kas
+                </a>
             </div>
 
             <div class="nav-section" sec:authorize="hasRole('ADMIN')">
