@@ -98,14 +98,14 @@ public class DataSeeder implements CommandLineRunner {
     private void seedCategories() {
         if (categoryRepository.count() == 0) {
             String[][] cats = {
-                {"Makanan & Minuman", "Produk makanan dan minuman"},
-                {"Kebutuhan Rumah Tangga", "Produk rumah tangga"},
-                {"Kebersihan & Perawatan", "Produk kebersihan dan perawatan diri"},
-                {"Elektronik", "Produk elektronik dan aksesoris"},
-                {"Alat Tulis", "Alat tulis dan perlengkapan kantor"},
-                {"Frozen Food", "Makanan beku"},
-                {"Snack & Permen", "Makanan ringan dan permen"},
-                {"Minuman Kemasan", "Minuman botol dan kemasan"}
+                    { "Makanan & Minuman", "Produk makanan dan minuman" },
+                    { "Kebutuhan Rumah Tangga", "Produk rumah tangga" },
+                    { "Kebersihan & Perawatan", "Produk kebersihan dan perawatan diri" },
+                    { "Elektronik", "Produk elektronik dan aksesoris" },
+                    { "Alat Tulis", "Alat tulis dan perlengkapan kantor" },
+                    { "Frozen Food", "Makanan beku" },
+                    { "Snack & Permen", "Makanan ringan dan permen" },
+                    { "Minuman Kemasan", "Minuman botol dan kemasan" }
             };
             for (String[] cat : cats) {
                 categoryRepository.save(new Category(null, cat[0], cat[1], null));
@@ -116,10 +116,10 @@ public class DataSeeder implements CommandLineRunner {
     private void seedSuppliers() {
         if (supplierRepository.count() == 0) {
             Object[][] suppliers = {
-                {"PT Indofood", "021-7534000", "sales@indofood.co.id", "Jakarta Selatan"},
-                {"PT Unilever Indonesia", "021-5299000", "contact@unilever.co.id", "Tangerang"},
-                {"CV Berkah Jaya", "0274-512000", "berkah@email.com", "Yogyakarta"},
-                {"UD Sumber Rejeki", "031-845000", "sumber@email.com", "Surabaya"}
+                    { "PT Indofood", "021-7534000", "sales@indofood.co.id", "Jakarta Selatan" },
+                    { "PT Unilever Indonesia", "021-5299000", "contact@unilever.co.id", "Tangerang" },
+                    { "CV Berkah Jaya", "0274-512000", "berkah@email.com", "Yogyakarta" },
+                    { "UD Sumber Rejeki", "031-845000", "sumber@email.com", "Surabaya" }
             };
             for (Object[] s : suppliers) {
                 Supplier supplier = new Supplier();
@@ -142,14 +142,14 @@ public class DataSeeder implements CommandLineRunner {
             Category cat2 = categoryRepository.findByName("Kebutuhan Rumah Tangga").orElseThrow();
 
             Object[][] products = {
-                {"8999999820112", "Indomie Goreng", cat1, 2800.0, 3500.0, 100, 20},
-                {"8992388505018", "Aqua 600ml", cat1, 2000.0, 3000.0, 150, 30},
-                {"8991102100015", "Sabun Lifebuoy 90gr", cat3, 3500.0, 5000.0, 50, 10},
-                {"8997023440027", "Chitato BBQ 55gr", cat7, 6500.0, 9000.0, 80, 15},
-                {"8999999010028", "Teh Botol Sosro 450ml", cat8, 4000.0, 6000.0, 120, 25},
-                {"8991102150039", "Pepsodent 120gr", cat3, 8000.0, 12000.0, 40, 10},
-                {"8998866240040", "Rinso Anti Noda 1kg", cat2, 18000.0, 24000.0, 30, 8},
-                {"8997023110051", "Oreo 119gr", cat7, 9000.0, 13000.0, 60, 12}
+                    { "8999999820112", "Indomie Goreng", cat1, 2800.0, 3500.0, 100, 20 },
+                    { "8992388505018", "Aqua 600ml", cat1, 2000.0, 3000.0, 150, 30 },
+                    { "8991102100015", "Sabun Lifebuoy 90gr", cat3, 3500.0, 5000.0, 50, 10 },
+                    { "8997023440027", "Chitato BBQ 55gr", cat7, 6500.0, 9000.0, 80, 15 },
+                    { "8999999010028", "Teh Botol Sosro 450ml", cat8, 4000.0, 6000.0, 120, 25 },
+                    { "8991102150039", "Pepsodent 120gr", cat3, 8000.0, 12000.0, 40, 10 },
+                    { "8998866240040", "Rinso Anti Noda 1kg", cat2, 18000.0, 24000.0, 30, 8 },
+                    { "8997023110051", "Oreo 119gr", cat7, 9000.0, 13000.0, 60, 12 }
             };
 
             for (Object[] p : products) {
@@ -171,11 +171,14 @@ public class DataSeeder implements CommandLineRunner {
     private void seedSales() {
         if (saleRepository.count() < 10) {
             List<User> users = userRepository.findAll();
-            if (users.isEmpty()) return;
-            User kasir = users.stream().filter(u -> "KASIR".equals(u.getRole().getName())).findFirst().orElse(users.get(0));
+            if (users.isEmpty())
+                return;
+            User kasir = users.stream().filter(u -> "KASIR".equals(u.getRole().getName())).findFirst()
+                    .orElse(users.get(0));
 
             List<Product> products = productRepository.findAll();
-            if (products.isEmpty()) return;
+            if (products.isEmpty())
+                return;
 
             Random random = new Random();
             LocalDateTime now = LocalDateTime.now();
@@ -188,17 +191,18 @@ public class DataSeeder implements CommandLineRunner {
 
                 for (int j = 0; j < salesPerDay; j++) {
                     Sale sale = new Sale();
-                    
+
                     // random time in the day
                     LocalDateTime soldAt = currentDay.withHour(8 + random.nextInt(12)).withMinute(random.nextInt(60));
                     sale.setSoldAt(soldAt);
                     sale.setCreatedAt(soldAt);
-                    
-                    String invoiceStr = "TRX-" + soldAt.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-" + random.nextInt(1000);
+
+                    String invoiceStr = "TRX-" + soldAt.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-"
+                            + random.nextInt(1000);
                     sale.setInvoiceNumber(invoiceStr);
                     sale.setUser(kasir);
-                    
-                    String[] methods = {"CASH", "DEBIT", "QRIS"};
+
+                    String[] methods = { "CASH", "DEBIT", "QRIS" };
                     sale.setPaymentMethod(methods[random.nextInt(methods.length)]);
                     sale.setStatus("COMPLETED");
 
@@ -209,18 +213,18 @@ public class DataSeeder implements CommandLineRunner {
                     for (int k = 0; k < numItems; k++) {
                         Product p = products.get(random.nextInt(products.size()));
                         int qty = random.nextInt(3) + 1;
-                        
+
                         SaleDetail detail = new SaleDetail();
                         detail.setSale(sale);
                         detail.setProduct(p);
                         detail.setQuantity(qty);
                         detail.setSellPrice(p.getSellPrice());
                         detail.setBuyPrice(p.getBuyPrice());
-                        
+
                         BigDecimal subtotal = p.getSellPrice().multiply(BigDecimal.valueOf(qty));
                         detail.setSubtotal(subtotal);
                         detail.setCreatedAt(soldAt);
-                        
+
                         details.add(detail);
                         totalAmount = totalAmount.add(subtotal);
                     }
@@ -228,7 +232,7 @@ public class DataSeeder implements CommandLineRunner {
                     sale.setDetails(details);
                     sale.setTotalAmount(totalAmount);
                     sale.setDiscount(BigDecimal.ZERO);
-                    
+
                     // Paid amount is totalAmount rounded up to nearest 5000 or 10000 or exact
                     BigDecimal paidAmount = totalAmount;
                     if (sale.getPaymentMethod().equals("CASH")) {

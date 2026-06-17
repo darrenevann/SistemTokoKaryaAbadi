@@ -78,6 +78,7 @@ public class ProductService {
         existing.setName(product.getName());
         existing.setCategory(product.getCategory());
         existing.setBuyPrice(product.getBuyPrice());
+        existing.setSellPrice(product.getSellPrice());
         existing.setMinStock(product.getMinStock());
         existing.setUnit(product.getUnit());
         existing.setIsActive(product.getIsActive());
