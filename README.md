@@ -65,11 +65,3 @@ Buka terminal di root direktori proyek, jalankan:
 
 4. **Login Default:**
 * Admin: `admin` / `admin123`
-
-## UI/UX Design System
-
-Dibangun menggunakan Vanilla CSS tanpa framework eksternal untuk performa optimal.
-
-* **Primary Color**: `#0B2B26`
-* **Accent Color**: `#235347`
-* **Success Color**: `#8EB69B`
